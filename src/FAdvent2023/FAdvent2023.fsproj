@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Days\Utils.fs" />
     <Compile Include="Days\Day1.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

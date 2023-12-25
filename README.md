@@ -2,7 +2,8 @@
 
 ## Setting up your environment
 
-Developing in this repository is best done with VS Code. You need to have the following things installed:
+Developing in this repository is best done with VS Code.
+You need to have the following things installed:
 
 - The [Dotnet SDK 8](https://dotnet.microsoft.com/en-us/download)
 - The [Ionide F# IDE](https://ionide.io) VS Code extension, `ionide.ionide-fsharp`
@@ -11,10 +12,26 @@ Developing in this repository is best done with VS Code. You need to have the fo
   - Fantomas is a dotnet tool. After installing the Dotnet SDK, you can install Fantomas with the following command:
   
     ```sh
-    dotnet tool install -g fantomas
+    $ dotnet tool install -g fantomas
     ```
 
   - The VS Code workspace settings included in this repository will set Fantomas to format on save.
+
+## Running the program
+
+From the root of the repository,
+the project can be run by:
+
+```sh
+$ dotnet run --project src/FAdvent2023
+```
+
+You need to supply the Advent of Code input files,
+which should be saved in the `input/` folder of the repository.
+
+The files should be named in the style of `day1.txt`.
+If part 2 has a separate input file,
+it should be named in the style of `day1part2.txt`.
 
 ## Resources
 

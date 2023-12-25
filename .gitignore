@@ -3,6 +3,10 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# advent of code files
+input/*
+!input/.gitkeep
+
 # dotenv files
 .env
 
