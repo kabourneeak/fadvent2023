@@ -1,5 +1,7 @@
 # Advent of Code 2023 in F#
 
+[Advent of Code 2023](https://adventofcode.com/2023)
+
 ## Setting up your environment
 
 Developing in this repository is best done with VS Code.
@@ -36,6 +38,7 @@ it should be named in the style of `day1part2.txt`.
 ## Resources
 
 - [FSharp Cheatsheet](https://fsprojects.github.io/fsharp-cheatsheet/)
-- [Learn F#](https://dotnet.microsoft.com/en-us/learn/fsharp) from Microsoft
 - [FSharp Documentation](https://fsharp.org/docs/) from the F# Software Foundation
+  - [FSharp Core Library Documentation](https://fsharp.github.io/fsharp-core-docs/)
+- [Learn F#](https://dotnet.microsoft.com/en-us/learn/fsharp) from Microsoft
 - [FsUnit](https://github.com/fsprojects/FsUnit)
