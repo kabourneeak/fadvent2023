@@ -5,4 +5,5 @@ let main argv =
     Day1.part1Runner ()
     Day1.part2Runner ()
     Day2.part1Runner ()
+    Day2.part2Runner ()
     0 // return an integer exit code

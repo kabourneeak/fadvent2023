@@ -48,3 +48,21 @@ let part1Runner () =
     let sumOfGames = readInputFile "day2.txt" |> part1
     printf $"Day 2 Part 1 Answer: Sum of possible game IDs is {sumOfGames}\n"
     ()
+
+let findMinimalDraw game =
+    game.Draws
+    |> Seq.reduce (fun d1 d2 ->
+        { Red = max d1.Red d2.Red
+          Green = max d1.Green d2.Green
+          Blue = max d1.Blue d2.Blue })
+
+let part2 input =
+    let games = input |> Seq.map toGameModel
+    let minimalDraws = games |> Seq.map findMinimalDraw
+    let powers = minimalDraws |> Seq.map (fun d -> d.Red * d.Green * d.Blue)
+    Seq.sum powers
+
+let part2Runner () =
+    let sumOfGames = readInputFile "day2.txt" |> part2
+    printf $"Day 2 Part 2 Answer: Sum of the power of minimul sets is {sumOfGames}\n"
+    ()
