@@ -6,6 +6,7 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Days\Day3Tests.fs" />
     <Compile Include="Days\Day2Tests.fs" />
     <Compile Include="Days\Day1Tests.fs" />
     <Compile Include="Program.fs" />
