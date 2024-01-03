@@ -18,6 +18,7 @@ You need to have the following things installed:
     ```
 
   - The VS Code workspace settings included in this repository will set Fantomas to format on save.
+- If you find the default presentation of F# code to be "noisy" with respect to parameter name and type hints in the editor, then adjust the F# "Inlay Hints" settings in VS Code.
 
 ## Running the program
 

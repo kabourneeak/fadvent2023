@@ -10,15 +10,7 @@ let ToGrid_ShouldCreateGridFromRow () =
     let input = [ "....." ]
     let result = Day3.toGrid input
 
-    let expected =
-        { Rows = 1
-          Cols = 5
-          Cells =
-            Array2D.create
-                1
-                5
-                { AdjacentToSymbol = false
-                  Type = Empty } }
+    let expected = { Cells = Array2D.create 1 5 DefaultGridCell }
 
     Assert.That(result, Is.EqualTo(expected))
 
@@ -27,15 +19,19 @@ let ToGrid_ShouldCreateGridFromCols () =
     let input = [ "."; "."; "."; "."; "." ]
     let result = Day3.toGrid input
 
-    let expected =
-        { Rows = 5
-          Cols = 1
-          Cells =
-            Array2D.create
-                5
-                1
-                { AdjacentToSymbol = false
-                  Type = Empty } }
+    let expected = { Cells = Array2D.create 5 1 DefaultGridCell }
+
+    Assert.That(result, Is.EqualTo(expected))
+
+[<Test>]
+[<TestCase("*1234", 1234)>]
+[<TestCase(".1234", 0)>]
+[<TestCase("1234*", 1234)>]
+[<TestCase("1234.", 0)>]
+let GetPartNumbers_ShouldGetNumber (line: string, expected: int) =
+    let input = [ line ]
+
+    let result = Day3.part1 input
 
     Assert.That(result, Is.EqualTo(expected))
 

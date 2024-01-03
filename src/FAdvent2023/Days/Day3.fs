@@ -9,112 +9,137 @@ type CellType =
 
 type GridCell =
     { Type: CellType
-      AdjacentToSymbol: bool }
+      Value: Option<int>
+      ValueId: Option<int> }
 
-type Grid =
-    { Rows: int
-      Cols: int
-      Cells: GridCell array2d }
+let DefaultGridCell =
+    { Type = Empty
+      Value = None
+      ValueId = None }
+
+type Grid = { Cells: GridCell array2d }
+
+let toIndexedSequence (array: 'a array2d) =
+    seq {
+        for row in 0 .. (Array2D.length1 array) - 1 do
+            for col in 0 .. (Array2D.length2 array) - 1 do
+                yield (row, col, Array2D.get array row col)
+    }
 
 let unwrapDigit c =
     match c with
     | Digit d -> d
-    | _ -> raise (System.ArgumentOutOfRangeException(nameof c))
+    | _ -> invalidArg (nameof c) "Cannot unwrap other cell types"
+
+let isDigit c =
+    match c with
+    | Digit _ -> true
+    | _ -> false
+
+let isSymbol c =
+    match c with
+    | Symbol -> true
+    | _ -> false
 
 let toGrid (input: list<string>) =
     let rows = input.Length
     let cols = input[0].Length
 
-    let emptyGrid =
-        Array2D.create
-            rows
-            cols
-            { Type = Empty
-              AdjacentToSymbol = false }
+    let cells = Array2D.create rows cols DefaultGridCell
 
-    let populatedGrid =
-        emptyGrid
-        |> Array2D.mapi (fun row col gridcell ->
-            let cellType =
-                match input[row][col] with
-                | '0' -> Digit(0)
-                | '1' -> Digit(1)
-                | '2' -> Digit(2)
-                | '3' -> Digit(3)
-                | '4' -> Digit(4)
-                | '5' -> Digit(5)
-                | '6' -> Digit(6)
-                | '7' -> Digit(7)
-                | '8' -> Digit(8)
-                | '9' -> Digit(9)
-                | '.' -> Empty
-                | _ -> Symbol
+    // populate cells with token types
+    cells
+    |> Array2D.iteri (fun row col gridcell ->
+        let cellType =
+            match input[row][col] with
+            | '0' -> Digit(0)
+            | '1' -> Digit(1)
+            | '2' -> Digit(2)
+            | '3' -> Digit(3)
+            | '4' -> Digit(4)
+            | '5' -> Digit(5)
+            | '6' -> Digit(6)
+            | '7' -> Digit(7)
+            | '8' -> Digit(8)
+            | '9' -> Digit(9)
+            | '.' -> Empty
+            | _ -> Symbol
 
-            { gridcell with Type = cellType })
+        Array2D.set cells row col { gridcell with Type = cellType })
 
-    let isAdjacentToSymbol array row col =
-        let adjacencies =
-            [ (-1, -1)
-              (-1, 0)
-              (-1, +1)
-              (0, -1)
-              (0, 0)
-              (0, +1)
-              (+1, -1)
-              (+1, 0)
-              (+1, +1) ]
+    let mutable nextValueId = 0
 
-        let isInBounds (row, col) =
-            row >= 0 && row < rows && col >= 0 && col < cols
+    let extractValue row col =
+        // identify cells containing sequential digits
+        let rowSlice = cells[row, col..]
+        let digitCells = rowSlice |> Seq.takeWhile (fun c -> isDigit c.Type)
 
-        let neighbours =
-            adjacencies
-            |> Seq.map (fun (adjRow, adjCol) -> (row + adjRow, col + adjCol))
-            |> Seq.where isInBounds
-            |> Seq.map (fun (row, col) -> Array2D.get array row col)
-
-        let atLeastOneNearbySymbol = neighbours |> Seq.exists (fun n -> n.Type = Symbol)
-
-        atLeastOneNearbySymbol
-
-    let adjecencyGrid =
-        populatedGrid
-        |> Array2D.mapi (fun row col value ->
-            { value with
-                AdjacentToSymbol = isAdjacentToSymbol populatedGrid row col })
-
-    { Rows = rows
-      Cols = cols
-      Cells = adjecencyGrid }
-
-let getPartNumbers (grid: Grid) =
-    let toPartNum l =
-        let hasAdjacentSymbol = l |> Seq.exists _.AdjacentToSymbol
-        let digits = l |> Seq.map _.Type |> Seq.map unwrapDigit
+        // combine digits into scalar value
+        let digits = digitCells |> Seq.map _.Type |> Seq.map unwrapDigit
         let value = digits |> Seq.fold (fun t o -> t * 10 + o) 0
 
-        match (value, hasAdjacentSymbol) with
-        | (0, _) -> None
-        | (_, false) -> None
-        | _ -> Some(value)
+        // assign id
+        let valueId = nextValueId
+        nextValueId <- nextValueId + 1
 
-    let mutable accum = List.empty
-    let mutable partNums = List.empty
+        // write back to array
+        digitCells
+        |> Seq.iteri (fun i g ->
+            Array2D.set
+                cells
+                row
+                (col + i)
+                { g with
+                    Value = Some(value)
+                    ValueId = Some(valueId) })
 
-    for r in 0 .. grid.Rows - 1 do
-        for c in 0 .. grid.Cols - 1 do
-            let cell = Array2D.get grid.Cells r c
+        ()
 
-            match cell.Type with
-            | Digit _ -> accum <- List.append accum [ cell ]
-            | _ ->
-                partNums <- List.append partNums [ toPartNum accum ]
-                accum <- []
+    // populate cells with values created from consequtive digits
+    cells
+    |> Array2D.iteri (fun row col gridcell ->
+        match (gridcell.Type, gridcell.ValueId) with
+        | (Digit _, None) -> extractValue row col
+        | _ -> ())
 
-        partNums <- List.append partNums [ toPartNum accum ]
-        accum <- []
+    { Cells = cells }
 
-    partNums |> Seq.where Option.isSome |> Seq.map Option.get
+let neighbours (array: GridCell array2d) row col =
+    let rows = Array2D.length1 array
+    let cols = Array2D.length2 array
+
+    let adjacencies =
+        [ (-1, -1)
+          (-1, 0)
+          (-1, +1)
+          (0, -1)
+          (0, 0)
+          (0, +1)
+          (+1, -1)
+          (+1, 0)
+          (+1, +1) ]
+
+    let isInBounds (row, col) =
+        row >= 0 && row < rows && col >= 0 && col < cols
+
+    adjacencies
+    |> Seq.map (fun (adjRow, adjCol) -> (row + adjRow, col + adjCol))
+    |> Seq.where isInBounds
+    |> Seq.map (fun (row, col) -> Array2D.get array row col)
+
+let getPartNumbers (grid: Grid) =
+    grid.Cells
+    |> toIndexedSequence
+    // find symbols first, as there are fewer of them
+    |> Seq.where (fun (_, _, g) -> isSymbol g.Type)
+    // collect all the neighbours of symbols
+    |> Seq.collect (fun (r, c, g) -> neighbours grid.Cells r c)
+    // reduce to distinct values by value id
+    |> Seq.where (fun g -> Option.isSome g.Value)
+    |> Seq.distinctBy (fun g -> g.ValueId)
+    // get the values
+    |> Seq.map _.Value
+    |> Seq.map Option.get
 
 let part1 input =
     let grid = toGrid input
