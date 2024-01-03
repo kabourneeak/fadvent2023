@@ -52,3 +52,21 @@ let Part1_ShouldReturnExpectedSum () =
     let result = Day3.part1 input
 
     Assert.That(result, Is.EqualTo(4361))
+
+[<Test>]
+let Part2_ShouldReturnExpectedSum () =
+    let input =
+        [ "467..114.."
+          "...*......"
+          "..35..633."
+          "......#..."
+          "617*......"
+          ".....+.58."
+          "..592....."
+          "......755."
+          "...$.*...."
+          ".664.598.." ]
+
+    let result = Day3.part2 input
+
+    Assert.That(result, Is.EqualTo(467835))

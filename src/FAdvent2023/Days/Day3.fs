@@ -4,7 +4,7 @@ open FAdvent2023.Utils
 
 type CellType =
     | Digit of value: int
-    | Symbol
+    | Symbol of value: char
     | Empty
 
 type GridCell =
@@ -38,7 +38,12 @@ let isDigit c =
 
 let isSymbol c =
     match c with
-    | Symbol -> true
+    | Symbol _ -> true
+    | _ -> false
+
+let isStar c =
+    match c with
+    | Symbol('*') -> true
     | _ -> false
 
 let toGrid (input: list<string>) =
@@ -63,7 +68,7 @@ let toGrid (input: list<string>) =
             | '8' -> Digit(8)
             | '9' -> Digit(9)
             | '.' -> Empty
-            | _ -> Symbol
+            | c -> Symbol(c)
 
         Array2D.set cells row col { gridcell with Type = cellType })
 
@@ -141,6 +146,28 @@ let getPartNumbers (grid: Grid) =
     |> Seq.map _.Value
     |> Seq.map Option.get
 
+let getGearRatios (grid: Grid) =
+    grid.Cells
+    |> toIndexedSequence
+    |> Seq.where (fun (_, _, g) -> isStar g.Type)
+    |> Seq.map (fun (r, c, _) ->
+        // get nearby distinct values to this star
+        let nearbyValues =
+            neighbours grid.Cells r c
+            |> Seq.where (fun g -> Option.isSome g.ValueId)
+            |> Seq.distinctBy (fun g -> g.ValueId)
+
+        // if there are exactly two nearby values, then this star is a gear,
+        // so calculate the gear ratio
+        match (Seq.length nearbyValues) with
+        | 2 ->
+            nearbyValues
+            |> Seq.map _.Value
+            |> Seq.map Option.get
+            |> Seq.fold (fun a v -> a * v) 1
+        | _ -> 0)
+    |> Seq.where (fun r -> r > 0)
+
 let part1 input =
     let grid = toGrid input
     let partNumbers = getPartNumbers grid
@@ -150,4 +177,15 @@ let part1 input =
 let part1Runner () =
     let sumOfPartNumbers = readInputFile "day3.txt" |> part1
     printf $"Day 3 Part 1 Answer: Sum of part numbers is {sumOfPartNumbers}\n"
+    ()
+
+let part2 input =
+    let grid = toGrid input
+    let gearRatios = getGearRatios grid
+
+    gearRatios |> Seq.sum
+
+let part2Runner () =
+    let sumOfPartNumbers = readInputFile "day3.txt" |> part2
+    printf $"Day 3 Part 2 Answer: Sum of gear ratios is {sumOfPartNumbers}\n"
     ()
