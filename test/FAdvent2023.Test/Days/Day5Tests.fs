@@ -42,7 +42,7 @@ let exampleInput =
 let Part1_ShouldHaveExpectedResult () =
     let result = Day5.part1 exampleInput
 
-    Assert.That(result, Is.EqualTo("n/a"))
+    Assert.That(result, Is.EqualTo(35))
 
 [<Test>]
 let Part2_ShouldHaveExpectedResult () =
