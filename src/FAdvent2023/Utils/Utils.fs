@@ -18,3 +18,16 @@ let readInputFile fileName =
     let inputPath = Path.Combine(projectRoot, "input", fileName)
     let lines = File.ReadAllLines(inputPath)
     Seq.toList lines
+
+[<TailCall>]
+let rec adjacentPairs s =
+    seq {
+        if (Seq.isEmpty s) then
+            ()
+        else
+            let l = s |> Seq.head
+            let r = s |> Seq.skip 1 |> Seq.head
+
+            yield (l, r)
+            yield! adjacentPairs (Seq.skip 2 s)
+    }

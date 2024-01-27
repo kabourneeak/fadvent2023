@@ -48,4 +48,4 @@ let Part1_ShouldHaveExpectedResult () =
 let Part2_ShouldHaveExpectedResult () =
     let result = Day5.part2 exampleInput
 
-    Assert.That(result, Is.EqualTo("n/a"))
+    Assert.That(result, Is.EqualTo(46))
