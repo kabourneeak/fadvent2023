@@ -12,4 +12,6 @@ let main argv =
     Day4.part2Runner ()
     Day5.part1Runner ()
     Day5.part2Runner ()
+    Day6.part1Runner ()
+    Day6.part2Runner ()
     0 // return an integer exit code
